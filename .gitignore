@@ -36,8 +36,6 @@ htmlcov/
 
 cache/
 
-data/
-
 !data/.gitkeep
 
 
