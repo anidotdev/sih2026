@@ -52,42 +52,33 @@ app = FastAPI(
 # CORS
 # ============================================================
 
-FRONTEND_URL = os.getenv(
+frontend_url = os.getenv(
     "FRONTEND_URL",
     "https://sih2026-517.pages.dev",
-)
+).rstrip("/")
 
 
-ALLOWED_ORIGINS = [
-    # Production Cloudflare Pages
+allowed_origins = [
+    frontend_url,
     "https://sih2026-517.pages.dev",
-
-    # Environment-configured frontend
-    FRONTEND_URL,
-
-    # Local development
     "http://localhost:4321",
     "http://127.0.0.1:4321",
 ]
 
 
-# Remove duplicates while preserving order.
-ALLOWED_ORIGINS = list(
+# Remove duplicates
+allowed_origins = list(
     dict.fromkeys(
-        ALLOWED_ORIGINS
+        allowed_origins
     )
 )
 
 
 app.add_middleware(
     CORSMiddleware,
-
-    allow_origins=ALLOWED_ORIGINS,
-
+    allow_origins=allowed_origins,
     allow_credentials=False,
-
     allow_methods=["*"],
-
     allow_headers=["*"],
 )
 
