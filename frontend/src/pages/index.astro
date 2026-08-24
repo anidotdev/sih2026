@@ -6,8 +6,13 @@ import "../styles/global.css";
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
+
         <meta name="viewport" content="width=device-width" />
+
+        <meta name="theme-color" content="#ffffff" />
+
         <title>Fireline</title>
+
         <link
             href="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.css"
             rel="stylesheet"
@@ -17,27 +22,31 @@ import "../styles/global.css";
     <body>
         <header class="topbar">
             <div class="brand">
-                <div class="brand-mark">◈</div>
+                <div class="brand-mark" aria-hidden="true">◈</div>
+
                 <span>FIRELINE</span>
+
                 <span class="brand-subtitle">
                     Industrial thermal intelligence
                 </span>
             </div>
 
             <div class="topbar-actions">
-                <div class="live-status">
-                    <span class="status-dot"></span>
-                    Live
+                <div class="live-status" aria-label="System status: live">
+                    <span class="status-dot" aria-hidden="true"></span>
+
+                    <span>Live</span>
                 </div>
 
                 <button
                     id="theme-toggle"
                     class="theme-toggle"
                     type="button"
-                    aria-label="Toggle theme"
-                    title="Toggle theme"
+                    aria-label="Toggle interface theme"
+                    title="Toggle interface theme"
                 >
-                    <span id="theme-icon">☼</span>
+                    <span id="theme-icon" aria-hidden="true"> ☼ </span>
+
                     <span>Theme</span>
                 </button>
 
@@ -52,6 +61,10 @@ import "../styles/global.css";
         </header>
 
         <main class="container">
+            <!-- =====================================================
+                 Hero
+                 ===================================================== -->
+
             <section class="hero">
                 <div class="eyebrow">INDUSTRIAL FIRE MONITORING</div>
 
@@ -67,101 +80,178 @@ import "../styles/global.css";
                 </p>
             </section>
 
-            <section class="metrics">
+            <!-- =====================================================
+                 Metrics
+                 ===================================================== -->
+
+            <section class="metrics" aria-label="Fire monitoring metrics">
                 <div class="metric">
                     <span>ACTIVE CLUSTERS</span>
-                    <strong id="active-clusters">0</strong>
+
+                    <strong id="active-clusters"> 0 </strong>
                 </div>
 
                 <div class="metric">
                     <span>HIGH RISK</span>
-                    <strong id="high-risk">0</strong>
+
+                    <strong id="high-risk"> 0 </strong>
                 </div>
 
                 <div class="metric">
                     <span>MAX FRP</span>
-                    <strong id="max-frp">0.00</strong>
+
+                    <strong id="max-frp"> 0.00 </strong>
                 </div>
 
                 <div class="metric">
                     <span>PERSISTENT</span>
-                    <strong id="persistent">0</strong>
+
+                    <strong id="persistent"> 0 </strong>
                 </div>
             </section>
 
+            <!-- =====================================================
+                 Main dashboard
+                 ===================================================== -->
+
             <section class="dashboard-grid">
+                <!-- =================================================
+                     Map
+                     ================================================= -->
+
                 <div class="panel map-panel">
-                    <div class="panel-header">
-                        <span>Activity map</span>
-                        <span class="muted">NCR / Haryana</span>
+                    <div class="panel-header map-header">
+                        <div class="map-title">
+                            <span> Activity map </span>
+
+                            <span class="muted" id="map-context">
+                                Haryana
+                            </span>
+                        </div>
+
+                        <div class="map-header-actions">
+                            <select
+                                id="state-select"
+                                class="state-select"
+                                aria-label="Select state"
+                            >
+                                <option value="Haryana"> Haryana </option>
+                            </select>
+
+                            <span class="muted" id="industrial-count">
+                                0 industrial features
+                            </span>
+                        </div>
                     </div>
 
-                    <div id="map"></div>
+                    <div
+                        id="map"
+                        aria-label="Interactive industrial fire activity map"
+                    >
+                    </div>
                 </div>
 
-                <aside class="panel alerts-panel">
+                <!-- =================================================
+                     Alerts
+                     ================================================= -->
+
+                <aside class="panel alerts-panel" aria-label="Fire alerts">
                     <div class="panel-header">
-                        <span>Alerts</span>
-                        <span id="alert-count" class="muted">0</span>
+                        <span> Alerts </span>
+
+                        <span id="alert-count" class="muted"> 0 </span>
                     </div>
 
                     <div id="alerts"></div>
                 </aside>
             </section>
 
-            <section id="cluster-detail" class="panel cluster-detail hidden">
+            <!-- =====================================================
+                 Cluster detail
+                 ===================================================== -->
+
+            <section
+                id="cluster-detail"
+                class="panel cluster-detail hidden"
+                aria-label="Cluster intelligence"
+            >
                 <div class="detail-header">
                     <div>
-                        <span class="detail-eyebrow">CLUSTER INTELLIGENCE</span>
+                        <span class="detail-eyebrow">
+                            CLUSTER INTELLIGENCE
+                        </span>
+
                         <h2 id="detail-title">Cluster</h2>
                     </div>
 
-                    <button id="close-detail" class="detail-close"> × </button>
+                    <button
+                        id="close-detail"
+                        class="detail-close"
+                        type="button"
+                        aria-label="Close cluster details"
+                    >
+                        ×
+                    </button>
                 </div>
 
                 <div class="detail-grid">
                     <div class="detail-item">
-                        <span>Classification</span>
-                        <strong id="detail-label">—</strong>
+                        <span> Classification </span>
+
+                        <strong id="detail-label"> — </strong>
                     </div>
 
                     <div class="detail-item">
-                        <span>Risk score</span>
-                        <strong id="detail-risk">—</strong>
+                        <span> Risk score </span>
+
+                        <strong id="detail-risk"> — </strong>
                     </div>
 
                     <div class="detail-item">
-                        <span>Maximum FRP</span>
-                        <strong id="detail-frp">—</strong>
+                        <span> Maximum FRP </span>
+
+                        <strong id="detail-frp"> — </strong>
                     </div>
 
                     <div class="detail-item">
-                        <span>Persistence</span>
-                        <strong id="detail-persistence">—</strong>
+                        <span> Persistence </span>
+
+                        <strong id="detail-persistence"> — </strong>
                     </div>
 
                     <div class="detail-item">
-                        <span>Industrial distance</span>
-                        <strong id="detail-distance">—</strong>
+                        <span> Industrial distance </span>
+
+                        <strong id="detail-distance"> — </strong>
                     </div>
 
                     <div class="detail-item">
-                        <span>Confidence</span>
-                        <strong id="detail-confidence">—</strong>
+                        <span> Confidence </span>
+
+                        <strong id="detail-confidence"> — </strong>
                     </div>
                 </div>
 
                 <div class="detail-reason">
-                    <span>Assessment</span>
-                    <p id="detail-reason">—</p>
+                    <span> Assessment </span>
+
+                    <p id="detail-reason-text">—</p>
                 </div>
             </section>
 
-            <section class="panel clusters-panel">
+            <!-- =====================================================
+                 Cluster table
+                 ===================================================== -->
+
+            <section
+                class="panel clusters-panel"
+                aria-label="Recent fire clusters"
+            >
                 <div class="panel-header table-header">
                     <div>
-                        <span>Recent clusters</span>
-                        <small>Ranked by thermal and spatial risk</small>
+                        <span> Recent clusters </span>
+
+                        <small> Ranked by thermal and spatial risk </small>
                     </div>
                 </div>
 
@@ -169,12 +259,17 @@ import "../styles/global.css";
                     <table>
                         <thead>
                             <tr>
-                                <th>Cluster</th>
-                                <th>Classification</th>
-                                <th>FRP</th>
-                                <th>Persistence</th>
-                                <th>Industrial distance</th>
-                                <th>Risk</th>
+                                <th> Cluster </th>
+
+                                <th> Classification </th>
+
+                                <th> FRP </th>
+
+                                <th> Persistence </th>
+
+                                <th> Industrial distance </th>
+
+                                <th> Risk </th>
                             </tr>
                         </thead>
 
@@ -184,8 +279,17 @@ import "../styles/global.css";
             </section>
         </main>
 
+        <!-- =========================================================
+             MapLibre
+             ========================================================= -->
+
         <script src="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js"
         ></script>
+
+        <!-- =========================================================
+             Fireline application
+             ========================================================= -->
+
         <script type="module" src="/scripts/dashboard.js"></script>
     </body>
 </html>

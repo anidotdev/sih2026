@@ -139,6 +139,53 @@ select {
   font: inherit;
 }
 
+.map-header {
+    gap: 16px;
+}
+
+.map-header > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.map-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.state-select {
+    height: 32px;
+
+    padding: 0 30px 0 10px;
+
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 7px;
+
+    background: #fff;
+    color: #222;
+
+    font: inherit;
+    font-size: 12px;
+
+    outline: none;
+}
+
+.state-select:focus {
+    border-color: rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 800px) {
+    .map-header-actions {
+        gap: 8px;
+    }
+
+    .map-header-actions .muted {
+        display: none;
+    }
+}
+
 button {
   border: 0;
 }
