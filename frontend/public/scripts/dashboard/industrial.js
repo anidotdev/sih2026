@@ -5,18 +5,35 @@ import { state } from "./state.js";
 export async function loadIndustrialForState(
   stateName
 ) {
-  const data =
-    await loadIndustrial(
-      stateName
+  try {
+    const data =
+      await loadIndustrial(
+        stateName
+      );
+
+    state.industrialData =
+      data;
+
+    console.log(
+      `Industrial features for ${stateName}:`,
+      data.features?.length || 0
     );
 
-  state.industrialData =
-    data;
+    return data;
 
-  console.log(
-    `Industrial features for ${stateName}:`,
-    data.features?.length || 0
-  );
+  } catch (error) {
+    console.error(
+      `Failed to load industrial data for ${stateName}:`,
+      error
+    );
 
-  return data;
+    state.industrialData = {
+      type: "FeatureCollection",
+      state: stateName,
+      feature_count: 0,
+      features: [],
+    };
+
+    throw error;
+  }
 }

@@ -1,4 +1,12 @@
-import { API_URL, FIRMS_DAYS } from "./config.js";
+import {
+  API_URL,
+  FIRMS_DAYS,
+} from "./config.js";
+
+
+/* ============================================================
+   Health
+   ============================================================ */
 
 export async function loadHealth() {
   const response = await fetch(
@@ -14,6 +22,11 @@ export async function loadHealth() {
   return response.json();
 }
 
+
+/* ============================================================
+   States
+   ============================================================ */
+
 export async function loadStates() {
   const response = await fetch(
     `${API_URL}/states`
@@ -28,22 +41,32 @@ export async function loadStates() {
   return response.json();
 }
 
+
+/* ============================================================
+   Fires
+   ============================================================ */
+
 export async function loadFires(
   state,
   days = FIRMS_DAYS
 ) {
-  const params = new URLSearchParams({
-    state,
-    days,
-  });
+  const params =
+    new URLSearchParams({
+      state,
+      days: String(days),
+    });
 
   const response = await fetch(
     `${API_URL}/fires?${params.toString()}`
   );
 
   if (!response.ok) {
-    const data = await response.json()
-      .catch(() => null);
+    const data =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
 
     throw new Error(
       data?.detail ||
@@ -54,20 +77,30 @@ export async function loadFires(
   return response.json();
 }
 
+
+/* ============================================================
+   Industrial
+   ============================================================ */
+
 export async function loadIndustrial(
   state
 ) {
-  const params = new URLSearchParams({
-    state,
-  });
+  const params =
+    new URLSearchParams({
+      state,
+    });
 
   const response = await fetch(
     `${API_URL}/industrial?${params.toString()}`
   );
 
   if (!response.ok) {
-    const data = await response.json()
-      .catch(() => null);
+    const data =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
 
     throw new Error(
       data?.detail ||
