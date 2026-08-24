@@ -52,18 +52,20 @@ app = FastAPI(
 # CORS
 # ============================================================
 
+FRONTEND_URL = os.getenv(
+    "FRONTEND_URL",
+    "http://localhost:4321",
+)
+
 app.add_middleware(
     CORSMiddleware,
-
     allow_origins=[
+        FRONTEND_URL,
         "http://localhost:4321",
         "http://127.0.0.1:4321",
     ],
-
     allow_credentials=False,
-
     allow_methods=["*"],
-
     allow_headers=["*"],
 )
 
