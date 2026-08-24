@@ -78,17 +78,15 @@ function setupStateSelector() {
     return;
   }
 
-
   selector.addEventListener(
     "change",
-    async event => {
+    async (event) => {
       const selectedState =
         event.target.value;
 
       if (!selectedState) {
         return;
       }
-
 
       await selectState(
         selectedState
@@ -97,6 +95,10 @@ function setupStateSelector() {
   );
 }
 
+
+/* ============================================================
+   Populate states
+   ============================================================ */
 
 async function populateStates() {
   const selector =
@@ -108,16 +110,14 @@ async function populateStates() {
     return;
   }
 
-
   try {
-
     const data =
       await loadStates();
 
-
     state.states =
-      data.states || [];
-
+      Array.isArray(data.states)
+        ? data.states
+        : [];
 
     if (!state.states.length) {
       throw new Error(
@@ -125,15 +125,12 @@ async function populateStates() {
       );
     }
 
-
     selector.innerHTML =
       state.states
         .map(
-          item => `
-            <option
-              value="${item.name}"
-            >
-              ${item.name}
+          (item) => `
+            <option value="${escapeHtml(item.name)}">
+              ${escapeHtml(item.name)}
             </option>
           `
         )
@@ -141,19 +138,17 @@ async function populateStates() {
 
 
     /*
-     * Preserve Haryana as the initial state
-     * if it exists.
+     * Prefer Haryana as the initial state.
      */
     const haryana =
       state.states.find(
-        item =>
+        (item) =>
           item.name ===
           "Haryana"
       );
 
 
     if (haryana) {
-
       state.selectedState =
         "Haryana";
 
@@ -170,10 +165,18 @@ async function populateStates() {
     }
 
 
+    /*
+     * IMPORTANT:
+     * The HTML starts the selector as disabled while
+     * states are loading. Re-enable it after loading.
+     */
+    selector.disabled =
+      false;
+
+
     console.log(
       `Loaded ${state.states.length} states`
     );
-
 
   } catch (error) {
 
@@ -184,9 +187,14 @@ async function populateStates() {
 
 
     /*
-     * Keep the static Haryana option.
-     * The map itself will still work.
+     * Fallback to Haryana.
      */
+    state.states = [
+      {
+        name: "Haryana",
+      },
+    ];
+
     state.selectedState =
       "Haryana";
 
@@ -196,6 +204,26 @@ async function populateStates() {
         Haryana
       </option>
     `;
+
+
+    /*
+     * IMPORTANT:
+     * Even if /states fails, the selector must still
+     * be usable.
+     */
+    selector.disabled =
+      false;
+
+
+    const context =
+      document.querySelector(
+        "#map-context"
+      );
+
+    if (context) {
+      context.textContent =
+        "Haryana";
+    }
   }
 }
 
@@ -207,6 +235,11 @@ async function populateStates() {
 async function selectState(
   stateName
 ) {
+  if (!stateName) {
+    return;
+  }
+
+
   state.selectedState =
     stateName;
 
@@ -235,14 +268,41 @@ async function selectState(
   }
 
 
+  const industrialCount =
+    document.querySelector(
+      "#industrial-count"
+    );
+
+
+  if (industrialCount) {
+    industrialCount.textContent =
+      "Loading...";
+  }
+
+
+  const alerts =
+    document.querySelector(
+      "#alerts"
+    );
+
+
+  if (alerts) {
+    alerts.innerHTML = `
+      <div class="empty">
+        Loading alerts...
+      </div>
+    `;
+  }
+
+
   try {
 
     /*
-     * Fetch fires and industrial data
-     * at the same time.
+     * Fetch both datasets concurrently.
      */
     const [
       fireData,
+      industrialData,
     ] = await Promise.all([
       loadFires(
         stateName
@@ -254,11 +314,29 @@ async function selectState(
     ]);
 
 
+    /*
+     * Store fire clusters.
+     */
     state.clusters =
-      fireData.clusters ||
-      [];
+      Array.isArray(
+        fireData.clusters
+      )
+        ? fireData.clusters
+        : [];
 
 
+    /*
+     * Store industrial data if the helper didn't already.
+     */
+    if (industrialData) {
+      state.industrialData =
+        industrialData;
+    }
+
+
+    /*
+     * Render dashboard.
+     */
     renderStats(
       state.clusters
     );
@@ -277,25 +355,40 @@ async function selectState(
 
 
     /*
-     * Map may already be loaded.
+     * Update map sources.
      */
     updateIndustrialSource();
+
     updateFireSource();
 
 
     /*
-     * Center the map on the selected state's
-     * FIRMS bbox if the backend supplied it.
+     * Update industrial feature count.
+     */
+    if (industrialCount) {
+
+      const count =
+        state.industrialData
+          ?.features
+          ?.length || 0;
+
+      industrialCount.textContent =
+        `${count} industrial features`;
+    }
+
+
+    /*
+     * Center on selected state's bbox.
      */
     if (
       state.map &&
+      fireData &&
       fireData.bbox
     ) {
       centerMapOnState(
         fireData.bbox
       );
     }
-
 
   } catch (error) {
 
@@ -305,21 +398,46 @@ async function selectState(
     );
 
 
-    const alerts =
-      document.querySelector(
-        "#alerts"
-      );
+    if (industrialCount) {
+      industrialCount.textContent =
+        "0 industrial features";
+    }
 
 
     if (alerts) {
       alerts.innerHTML = `
         <div class="empty error">
           ${escapeHtml(
-            error.message
+            error?.message ||
+            "Failed to load state data."
           )}
         </div>
       `;
     }
+
+
+    /*
+     * Clear stale clusters from the dashboard.
+     */
+    state.clusters = [];
+
+    renderStats(
+      state.clusters
+    );
+
+    renderAlerts(
+      state.clusters,
+      selectCluster
+    );
+
+    renderTable(
+      state.clusters,
+      selectCluster
+    );
+
+    updateFireSource();
+
+    updateIndustrialSource();
   }
 }
 
@@ -340,7 +458,9 @@ function centerMapOnState(
 
 
   const coordinates =
-    bboxString
+    String(
+      bboxString
+    )
       .split(",")
       .map(Number);
 
@@ -348,10 +468,15 @@ function centerMapOnState(
   if (
     coordinates.length !== 4 ||
     coordinates.some(
-      value =>
+      (value) =>
         !Number.isFinite(value)
     )
   ) {
+    console.warn(
+      "Invalid state bbox:",
+      bboxString
+    );
+
     return;
   }
 
@@ -405,7 +530,8 @@ document
       try {
 
         await selectState(
-          state.selectedState
+          state.selectedState ||
+          "Haryana"
         );
 
       } finally {
@@ -427,8 +553,14 @@ function handleIndustrialClick(
   feature,
   lngLat
 ) {
+  if (!state.map) {
+    return;
+  }
+
+
   const properties =
-    feature.properties || {};
+    feature?.properties ||
+    {};
 
 
   const name =
@@ -443,7 +575,8 @@ function handleIndustrialClick(
 
   const sourceState =
     properties.source_state ||
-    state.selectedState;
+    state.selectedState ||
+    "Unknown";
 
 
   new maplibregl.Popup({
@@ -500,17 +633,14 @@ function handleIndustrialClick(
 
 
 /* ============================================================
-   Start
+   Startup
    ============================================================ */
 
 async function init() {
   try {
 
     /*
-     * 1. Initialize the map FIRST.
-     *
-     * This means a failure in /states cannot
-     * prevent MapLibre from loading.
+     * 1. Initialize MapLibre first.
      */
     initializeMap(
       selectCluster,
@@ -519,28 +649,48 @@ async function init() {
 
 
     /*
-     * 2. Setup the selector.
+     * 2. Register selector events.
      */
     setupStateSelector();
 
 
     /*
      * 3. Load available states.
+     *
+     * This also explicitly enables the <select>.
      */
     await populateStates();
 
 
     /*
-     * 4. Backend health is checked independently.
+     * 4. Backend health check.
+     *
+     * Don't let a health-check failure prevent
+     * the actual state request from running.
      */
-    await loadHealth();
+    try {
+
+      await loadHealth();
+
+      console.log(
+        "[Fireline] Backend healthy."
+      );
+
+    } catch (healthError) {
+
+      console.warn(
+        "[Fireline] Backend health check failed:",
+        healthError
+      );
+    }
 
 
     /*
-     * 5. Load initial state.
+     * 5. Load the selected state.
      */
     await selectState(
-      state.selectedState
+      state.selectedState ||
+      "Haryana"
     );
 
 
@@ -552,6 +702,21 @@ async function init() {
     );
 
 
+    /*
+     * Make sure the selector is usable even if
+     * initialization encounters an unexpected error.
+     */
+    const selector =
+      document.querySelector(
+        "#state-select"
+      );
+
+    if (selector) {
+      selector.disabled =
+        false;
+    }
+
+
     const alerts =
       document.querySelector(
         "#alerts"
@@ -559,10 +724,12 @@ async function init() {
 
 
     if (alerts) {
+
       alerts.innerHTML = `
         <div class="empty error">
           ${escapeHtml(
-            error.message
+            error?.message ||
+            "Dashboard initialization failed."
           )}
         </div>
       `;
@@ -571,10 +738,16 @@ async function init() {
 }
 
 
+/* ============================================================
+   HTML escaping
+   ============================================================ */
+
 function escapeHtml(
   value
 ) {
-  return String(value)
+  return String(
+    value ?? ""
+  )
     .replaceAll(
       "&",
       "&amp;"
@@ -597,5 +770,9 @@ function escapeHtml(
     );
 }
 
+
+/* ============================================================
+   Start application
+   ============================================================ */
 
 init();
