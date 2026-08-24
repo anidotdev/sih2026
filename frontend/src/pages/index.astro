@@ -1,5 +1,7 @@
 ---
 import "../styles/global.css";
+
+const apiUrl = import.meta.env.PUBLIC_API_URL || "http://127.0.0.1:8000";
 ---
 
 <!doctype html>
@@ -11,6 +13,11 @@ import "../styles/global.css";
 
         <meta name="theme-color" content="#ffffff" />
 
+        <meta
+            name="description"
+            content="Fireline — industrial thermal intelligence powered by satellite fire detection, OSM context and machine learning."
+        />
+
         <title>Fireline</title>
 
         <link
@@ -20,11 +27,15 @@ import "../styles/global.css";
     </head>
 
     <body>
+        <!-- =====================================================
+             Topbar
+             ===================================================== -->
+
         <header class="topbar">
             <div class="brand">
                 <div class="brand-mark" aria-hidden="true">◈</div>
 
-                <span>FIRELINE</span>
+                <span> FIRELINE </span>
 
                 <span class="brand-subtitle">
                     Industrial thermal intelligence
@@ -32,10 +43,10 @@ import "../styles/global.css";
             </div>
 
             <div class="topbar-actions">
-                <div class="live-status" aria-label="System status: live">
+                <div class="live-status" aria-label="System status">
                     <span class="status-dot" aria-hidden="true"></span>
 
-                    <span>Live</span>
+                    <span id="system-status"> Live </span>
                 </div>
 
                 <button
@@ -47,7 +58,7 @@ import "../styles/global.css";
                 >
                     <span id="theme-icon" aria-hidden="true"> ☼ </span>
 
-                    <span>Theme</span>
+                    <span> Theme </span>
                 </button>
 
                 <button
@@ -61,9 +72,9 @@ import "../styles/global.css";
         </header>
 
         <main class="container">
-            <!-- =====================================================
+            <!-- =================================================
                  Hero
-                 ===================================================== -->
+                 ================================================= -->
 
             <section class="hero">
                 <div class="eyebrow">INDUSTRIAL FIRE MONITORING</div>
@@ -76,43 +87,44 @@ import "../styles/global.css";
                 <p>
                     Detect persistent satellite hotspots and distinguish
                     potential industrial fires from agricultural burning,
-                    wildfires and low-confidence anomalies.
+                    wildfires and other thermal anomalies using FIRMS, OSM and
+                    ML.
                 </p>
             </section>
 
-            <!-- =====================================================
+            <!-- =================================================
                  Metrics
-                 ===================================================== -->
+                 ================================================= -->
 
             <section class="metrics" aria-label="Fire monitoring metrics">
                 <div class="metric">
-                    <span>ACTIVE CLUSTERS</span>
+                    <span> ACTIVE CLUSTERS </span>
 
                     <strong id="active-clusters"> 0 </strong>
                 </div>
 
                 <div class="metric">
-                    <span>HIGH RISK</span>
+                    <span> HIGH RISK </span>
 
                     <strong id="high-risk"> 0 </strong>
                 </div>
 
                 <div class="metric">
-                    <span>MAX FRP</span>
+                    <span> MAX FRP </span>
 
                     <strong id="max-frp"> 0.00 </strong>
                 </div>
 
                 <div class="metric">
-                    <span>PERSISTENT</span>
+                    <span> PERSISTENT </span>
 
                     <strong id="persistent"> 0 </strong>
                 </div>
             </section>
 
-            <!-- =====================================================
+            <!-- =================================================
                  Main dashboard
-                 ===================================================== -->
+                 ================================================= -->
 
             <section class="dashboard-grid">
                 <!-- =================================================
@@ -125,7 +137,7 @@ import "../styles/global.css";
                             <span> Activity map </span>
 
                             <span class="muted" id="map-context">
-                                Haryana
+                                Loading...
                             </span>
                         </div>
 
@@ -134,8 +146,9 @@ import "../styles/global.css";
                                 id="state-select"
                                 class="state-select"
                                 aria-label="Select state"
+                                disabled
                             >
-                                <option value="Haryana"> Haryana </option>
+                                <option value=""> Loading states... </option>
                             </select>
 
                             <span class="muted" id="industrial-count">
@@ -162,13 +175,15 @@ import "../styles/global.css";
                         <span id="alert-count" class="muted"> 0 </span>
                     </div>
 
-                    <div id="alerts"></div>
+                    <div id="alerts">
+                        <div class="empty">Loading alerts...</div>
+                    </div>
                 </aside>
             </section>
 
-            <!-- =====================================================
+            <!-- =================================================
                  Cluster detail
-                 ===================================================== -->
+                 ================================================= -->
 
             <section
                 id="cluster-detail"
@@ -239,9 +254,9 @@ import "../styles/global.css";
                 </div>
             </section>
 
-            <!-- =====================================================
+            <!-- =================================================
                  Cluster table
-                 ===================================================== -->
+                 ================================================= -->
 
             <section
                 class="panel clusters-panel"
@@ -251,7 +266,7 @@ import "../styles/global.css";
                     <div>
                         <span> Recent clusters </span>
 
-                        <small> Ranked by thermal and spatial risk </small>
+                        <small> Ranked by thermal and contextual risk </small>
                     </div>
                 </div>
 
@@ -273,22 +288,40 @@ import "../styles/global.css";
                             </tr>
                         </thead>
 
-                        <tbody id="clusters-table"></tbody>
+                        <tbody id="clusters-table">
+                            <tr>
+                                <td colspan="6" class="empty">
+                                    Loading clusters...
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </section>
         </main>
 
-        <!-- =========================================================
+        <!-- =====================================================
              MapLibre
-             ========================================================= -->
+             ===================================================== -->
 
         <script src="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js"
         ></script>
 
-        <!-- =========================================================
+        <!-- =====================================================
+             Fireline runtime configuration
+             ===================================================== -->
+
+        <script define:vars={{ apiUrl }}>
+            window.__FIRELINE_CONFIG__ = {
+                API_URL: apiUrl,
+            };
+
+            console.log("[Fireline] API:", window.__FIRELINE_CONFIG__.API_URL);
+        </script>
+
+        <!-- =====================================================
              Fireline application
-             ========================================================= -->
+             ===================================================== -->
 
         <script type="module" src="/scripts/dashboard.js"></script>
     </body>

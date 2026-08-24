@@ -1,112 +1,96 @@
 import {
-  API_URL,
-  FIRMS_DAYS,
+    API_URL,
+    FIRMS_DAYS,
 } from "./config.js";
 
 
-/* ============================================================
-   Health
-   ============================================================ */
-
 export async function loadHealth() {
-  const response = await fetch(
-    `${API_URL}/health`
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      "Backend health check failed"
+    const response = await fetch(
+        `${API_URL}/health`
     );
-  }
 
-  return response.json();
+    if (!response.ok) {
+        throw new Error(
+            "Backend health check failed"
+        );
+    }
+
+    return response.json();
 }
 
-
-/* ============================================================
-   States
-   ============================================================ */
 
 export async function loadStates() {
-  const response = await fetch(
-    `${API_URL}/states`
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `States API returned ${response.status}`
+    const response = await fetch(
+        `${API_URL}/states`
     );
-  }
 
-  return response.json();
+    if (!response.ok) {
+        throw new Error(
+            `States API returned ${response.status}`
+        );
+    }
+
+    return response.json();
 }
 
-
-/* ============================================================
-   Fires
-   ============================================================ */
 
 export async function loadFires(
-  state,
-  days = FIRMS_DAYS
+    state,
+    days = FIRMS_DAYS
 ) {
-  const params =
-    new URLSearchParams({
-      state,
-      days: String(days),
-    });
+    const params =
+        new URLSearchParams({
+            state,
+            days: String(days),
+        });
 
-  const response = await fetch(
-    `${API_URL}/fires?${params.toString()}`
-  );
-
-  if (!response.ok) {
-    const data =
-      await response
-        .json()
-        .catch(
-          () => null
-        );
-
-    throw new Error(
-      data?.detail ||
-      `FIRMS API returned ${response.status}`
+    const response = await fetch(
+        `${API_URL}/fires?${params.toString()}`
     );
-  }
 
-  return response.json();
+    if (!response.ok) {
+        const data =
+            await response
+                .json()
+                .catch(
+                    () => null
+                );
+
+        throw new Error(
+            data?.detail ||
+            `FIRMS API returned ${response.status}`
+        );
+    }
+
+    return response.json();
 }
 
 
-/* ============================================================
-   Industrial
-   ============================================================ */
-
 export async function loadIndustrial(
-  state
+    state
 ) {
-  const params =
-    new URLSearchParams({
-      state,
-    });
+    const params =
+        new URLSearchParams({
+            state,
+        });
 
-  const response = await fetch(
-    `${API_URL}/industrial?${params.toString()}`
-  );
-
-  if (!response.ok) {
-    const data =
-      await response
-        .json()
-        .catch(
-          () => null
-        );
-
-    throw new Error(
-      data?.detail ||
-      `Industrial API returned ${response.status}`
+    const response = await fetch(
+        `${API_URL}/industrial?${params.toString()}`
     );
-  }
 
-  return response.json();
+    if (!response.ok) {
+        const data =
+            await response
+                .json()
+                .catch(
+                    () => null
+                );
+
+        throw new Error(
+            data?.detail ||
+            `Industrial API returned ${response.status}`
+        );
+    }
+
+    return response.json();
 }

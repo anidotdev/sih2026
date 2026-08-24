@@ -1,39 +1,52 @@
-import { loadIndustrial } from "./api.js";
-import { state } from "./state.js";
+import {
+    loadIndustrial,
+} from "./api.js";
+
+import {
+    state,
+} from "./state.js";
 
 
 export async function loadIndustrialForState(
-  stateName
+    stateName
 ) {
-  try {
-    const data =
-      await loadIndustrial(
-        stateName
-      );
+    try {
+        const data =
+            await loadIndustrial(
+                stateName
+            );
 
-    state.industrialData =
-      data;
+        state.industrialData =
+            data;
 
-    console.log(
-      `Industrial features for ${stateName}:`,
-      data.features?.length || 0
-    );
+        console.log(
+            `Industrial features for ${stateName}:`,
+            data.features?.length || 0
+        );
 
-    return data;
+        return data;
 
-  } catch (error) {
-    console.error(
-      `Failed to load industrial data for ${stateName}:`,
-      error
-    );
+    } catch (error) {
 
-    state.industrialData = {
-      type: "FeatureCollection",
-      state: stateName,
-      feature_count: 0,
-      features: [],
-    };
+        console.error(
+            `Failed to load industrial data for ${stateName}:`,
+            error
+        );
 
-    throw error;
-  }
+        state.industrialData = {
+            type:
+                "FeatureCollection",
+
+            state:
+                stateName,
+
+            feature_count:
+                0,
+
+            features:
+                [],
+        };
+
+        throw error;
+    }
 }
