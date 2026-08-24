@@ -6,6 +6,16 @@ const config =
    API
    ============================================================ */
 
+if (!config.API_URL) {
+    console.warn(
+        "[Fireline] window.__FIRELINE_CONFIG__.API_URL was not set. " +
+        "Falling back to http://127.0.0.1:8000 — this will fail on " +
+        "any deployed (non-local) environment. Check that " +
+        "PUBLIC_API_URL is set in Cloudflare Pages env vars and that " +
+        "index.astro's inline config script runs before dashboard.js."
+    );
+}
+
 export const API_URL =
     config.API_URL ||
     "http://127.0.0.1:8000";
