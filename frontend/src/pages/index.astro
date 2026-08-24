@@ -1,0 +1,191 @@
+---
+import "../styles/global.css";
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>Fireline</title>
+        <link
+            href="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.css"
+            rel="stylesheet"
+        />
+    </head>
+
+    <body>
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-mark">◈</div>
+                <span>FIRELINE</span>
+                <span class="brand-subtitle">
+                    Industrial thermal intelligence
+                </span>
+            </div>
+
+            <div class="topbar-actions">
+                <div class="live-status">
+                    <span class="status-dot"></span>
+                    Live
+                </div>
+
+                <button
+                    id="theme-toggle"
+                    class="theme-toggle"
+                    type="button"
+                    aria-label="Toggle theme"
+                    title="Toggle theme"
+                >
+                    <span id="theme-icon">☼</span>
+                    <span>Theme</span>
+                </button>
+
+                <button
+                    id="refresh-button"
+                    class="refresh-button"
+                    type="button"
+                >
+                    Refresh
+                </button>
+            </div>
+        </header>
+
+        <main class="container">
+            <section class="hero">
+                <div class="eyebrow">INDUSTRIAL FIRE MONITORING</div>
+
+                <h1>
+                    Thermal anomalies,<br />
+                    with context.
+                </h1>
+
+                <p>
+                    Detect persistent satellite hotspots and distinguish
+                    potential industrial fires from agricultural burning,
+                    wildfires and low-confidence anomalies.
+                </p>
+            </section>
+
+            <section class="metrics">
+                <div class="metric">
+                    <span>ACTIVE CLUSTERS</span>
+                    <strong id="active-clusters">0</strong>
+                </div>
+
+                <div class="metric">
+                    <span>HIGH RISK</span>
+                    <strong id="high-risk">0</strong>
+                </div>
+
+                <div class="metric">
+                    <span>MAX FRP</span>
+                    <strong id="max-frp">0.00</strong>
+                </div>
+
+                <div class="metric">
+                    <span>PERSISTENT</span>
+                    <strong id="persistent">0</strong>
+                </div>
+            </section>
+
+            <section class="dashboard-grid">
+                <div class="panel map-panel">
+                    <div class="panel-header">
+                        <span>Activity map</span>
+                        <span class="muted">NCR / Haryana</span>
+                    </div>
+
+                    <div id="map"></div>
+                </div>
+
+                <aside class="panel alerts-panel">
+                    <div class="panel-header">
+                        <span>Alerts</span>
+                        <span id="alert-count" class="muted">0</span>
+                    </div>
+
+                    <div id="alerts"></div>
+                </aside>
+            </section>
+
+            <section id="cluster-detail" class="panel cluster-detail hidden">
+                <div class="detail-header">
+                    <div>
+                        <span class="detail-eyebrow">CLUSTER INTELLIGENCE</span>
+                        <h2 id="detail-title">Cluster</h2>
+                    </div>
+
+                    <button id="close-detail" class="detail-close"> × </button>
+                </div>
+
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span>Classification</span>
+                        <strong id="detail-label">—</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Risk score</span>
+                        <strong id="detail-risk">—</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Maximum FRP</span>
+                        <strong id="detail-frp">—</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Persistence</span>
+                        <strong id="detail-persistence">—</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Industrial distance</span>
+                        <strong id="detail-distance">—</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Confidence</span>
+                        <strong id="detail-confidence">—</strong>
+                    </div>
+                </div>
+
+                <div class="detail-reason">
+                    <span>Assessment</span>
+                    <p id="detail-reason">—</p>
+                </div>
+            </section>
+
+            <section class="panel clusters-panel">
+                <div class="panel-header table-header">
+                    <div>
+                        <span>Recent clusters</span>
+                        <small>Ranked by thermal and spatial risk</small>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cluster</th>
+                                <th>Classification</th>
+                                <th>FRP</th>
+                                <th>Persistence</th>
+                                <th>Industrial distance</th>
+                                <th>Risk</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="clusters-table"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <script src="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js"
+        ></script>
+        <script type="module" src="/scripts/dashboard.js"></script>
+    </body>
+</html>
